@@ -1,0 +1,119 @@
+\documentclass{beamer}
+%% fink install texlive
+\usetheme{Warsaw}
+\usepackage{amsmath,amssymb}
+\usepackage{stmaryrd}
+\usepackage{graphicx}
+%\usepackage{haskell}
+\usepackage{code}
+%\usepackage{proof}
+\usepackage{theorem}
+\usepackage{pstricks} 
+
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, shapes}
+
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=1.5cm, minimum height=0.5cm,text centered, draw=black]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=1.5cm, minimum height=0.5cm, text centered, draw=black]
+\tikzstyle{process} = [rectangle, minimum width=1.5cm, minimum height=0.5cm, text centered, draw=black]
+\tikzstyle{decision} = [diamond, minimum width=1.5cm, minimum height=0.5cm, text centered, draw=black, aspect=3]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{doublearrow} = [thick,<->,>=stealth]
+\tikzstyle{db} = [cylinder, shape border rotate=90, draw,minimum
+height=1.5cm, minimum width=2cm, aspect=0.3]
+\tikzstyle{www} = [cloud, cloud puffs=15.7, cloud ignores
+aspect,minimum width=5cm, minimum height=2cm, align=center, draw]
+\tikzstyle{blank} = [rectangle] 
+\tikzstyle{container} = [rectangle, rounded corners, minimum
+width=7cm, minimum height=7cm,text centered, draw=black]
+
+\tikzstyle{darrow} = [thick,<->,>=stealth]
+
+\usepackage{listings}
+
+\include{macros-ms}
+
+\newcommand{\rev}[1]{{#1}^{\mbox{\scriptsize r}}}
+\newcommand{\lquo}{\backslash}
+\newcommand{\rquo}{/}
+\newcommand{\diff}{-}
+\newcommand{\isect}{\cap}
+\newcommand{\mymid}{~\redtxt{\mid}~}
+\newcommand{\lconf}[2]{#1:{\tt #2}}
+
+\newcommand{\ignore}[1]{}
+
+\newcommand{\magtxt}[1]{{\magenta #1}}
+\newcommand{\redtxt}[1]{{\red #1}}
+\newcommand{\bluetxt}[1]{{\blue #1}}
+\newcommand{\greytxt}[1]{{\gray #1}}
+\newcommand{\greentxt}[1]{{\green #1}}
+\newcommand{\mmleq}{\leq}
+\newcommand{\pow}{\^{}}
+\newcommand{\venv}{\Delta}
+\newcommand{\mleq}{\mbox{\tt leq}}
+\newcommand{\mas}{\mbox{\tt as}}
+\newcommand{\subt}{<\!:}
+
+\newcommand{\Nturns}{\, \vdash_{\mbox{\tiny lnf}} \,}
+
+\newcommand{\deriv}[2]{#1\backslash #2}
+\newcommand{\pderiv}[2]{pd_{#2}(#1)} %% {#1\backslash_p #2}
+\newcommand{\pderivFail}[2]{pd^{err}_{#2}(#1)} %% {#1\backslash_p #2}
+\newcommand{\mkEmp}[1]{{#1}_{\epsilon}}
+\newcommand{\strip}[1]{#1\downarrow}
+
+\newenvironment{ttprog}{\begin{trivlist}\item \tt
+        \begin{tabbing}}{\end{tabbing}\end{trivlist}}
+
+
+\newenvironment{grammar}{%
+         \begin{center} \small%
+         $\begin{array}{rcll}
+         }{%
+         \end{array}$\end{center}\ignorespaces%
+         }
+
+\newcommand{\rem}[1]{}
+\newcommand{\comment}[1]{}
+
+\newcommand{\kl}[1]{}
+
+\bibliographystyle{plainnat}
+
+\begin{document}
+%\lstset{language=python}
+\logo{
+\includegraphics[height=0.8cm]{pics/nyp-logo.eps}\vspace{230pt}
+\includegraphics[height=0.6cm]{pics/sit-logo.png}\vspace{230pt}
+}
+\title{Introduction to Scala} 
+\author{
+ Kenny Zhuo Ming Lu
+}
+\institute[Inst.]{School of Information Technology, Nanyang Polytechnic}
+\date{\today} 
+
+
+\frame{\titlepage} 
+
+%\bibliographystyle{plainnat}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Agenda}
+\begin{itemize}
+ \item Object Oriented Programming in Scala
+ \item Functional Programming in Scala
+ \item (Generalized) Algebraic Data Type and pattern matching
+ \item Functional Abstraction and Higher order function
+ \item Type classes and Monads
+ \item 
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}
+
