@@ -125,9 +125,133 @@ A general purpose programming language that is
  \item with distributed programming builtin
  \item with a rich type system and a huge set of libraries and eco-systems
  \item Widely used in research institutes (e.g. Spark) and industries
-   (e.g. Twitter, Linkedin, EDF, ... )
+   (e.g. Twitter, Linkedin, Coursera Walmart, ... )
 \end{itemize}
 \end{frame}
+
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Object Oriented Programming in Scala}
+It is very similar to Java
+\begin{code}
+class Person(n:String,i:String) {
+   private val name:String = n
+   private val id:String   = i
+   def getName():String = name
+   def getId():String = id
+}
+\end{code}
+\begin{itemize}
+ \item {\tt Person} is the name of the class, {\tt
+     Person(n:String,i:String)} is a constructor.
+ \item {\tt private} sets the accessibility scope of the members
+ \item {\tt val} introduces a value, (immutable variable)
+ \item {\tt def} introduces a function defintion.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Object Oriented Programming in Scala}
+
+Class Inheritence via the {\tt extends} keyword
+\begin{code}
+class Student(n:String, i:String, g:Double) 
+                     extends Person(n,i) {
+   private var gpa = g
+   def getGPA() = gpa
+   def setGPA(g:Double) = {
+      gpa = g
+   }
+}
+\end{code}
+\begin{itemize}
+ \item {\tt var} introduces a mutable variable
+ \item Most of the type annotations are optional and will be inferred
+   by the type system.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Object Oriented Programming in Scala}
+\begin{code}
+class Staff(n:String, i:String, sal:Double) 
+                 extends Person(n,i) {
+   private var salary = sal
+   def getSalary() = salary
+   def setSalary(sal:Double) = 
+   {
+      salary = sal
+   }
+}
+\end{code}
+\end{frame}
+
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Object Oriented Programming in Scala}
+Traits are like Java interfaces and abstract classes
+\begin{code}
+trait NightOwl {
+   def stayUpLate():Unit 
+}
+
+class Student(n:String, i:String, g:Double) 
+      extends Person(n,i) with NightOwl {
+   private var gpa = g
+   def getGPA() = gpa
+   def setGPA(g:Double) = {
+      gpa = g
+   }
+   override def stayUpLate():Unit = { 
+      println("woohoo") 
+   }
+}
+\end{code}
+\end{frame}
+
+
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+
+
+\begin{frame}[fragile]
+\frametitle{Running our first Scala program}
+Scala comes with an interpretor (AKA REPL)
+
+\begin{code}
+scala> :load OOP.scala
+Loading OOP.scala...
+defined class Person
+defined trait NightOwl
+defined class Student
+defined class Staff
+
+scala> val tom = new Student("Tom", "X1235", 4.0)
+tom: Student = Student@601c1dfc
+
+scala> val martin = new Staff("Martin", "T0001", 500000.0)
+martin: Staff = Staff@650fbe32
+
+scala> tom.stayUpLate
+woohoo
+\end{code}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+
+
 
 
 
