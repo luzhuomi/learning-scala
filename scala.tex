@@ -129,6 +129,40 @@ A general purpose programming language that is
 \end{itemize}
 \end{frame}
 
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Hello World in a script}
+Let's say we have a scala file {\tt Script.scala}
+\begin{code}
+println("Hello world!")
+\end{code}
+To execute it
+\begin{code}
+$ scala Script.scala
+Hello world!
+\end{code}
+%$
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Hello World in a console application}
+Compiling Scala program into an application
+\begin{code}
+object Main extends App 
+{
+    println("Hello world!")
+}
+\end{code}
+To execute it
+\begin{code}
+$ scalac Main.scala
+$ scala Main
+Hello world!
+\end{code}
+\end{frame}
 
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
