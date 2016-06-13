@@ -45,8 +45,8 @@ defined class Staff
 scala> val tom = new Student("Tom", "X1235", 4.0)
 tom: Student = Student@601c1dfc
 
-scala> val martin = new Staff("Martin", "T0001", 500000.0)
-martin: Staff = Staff@650fbe32
+scala> val jerry = new Staff("Jerry", "T0001", 500000.0)
+jerry: Staff = Staff@650fbe32
 
 scala> tom.stayUpLate
 woohoo
