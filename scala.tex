@@ -904,9 +904,44 @@ instance Eq a => Eq [a] where
   (==) [] _  = False
   (==) _ []  = False
   (==) (x:xs) (y:ys) = (x == y) && (xs == ys)
+
+check :: (Eq a) => [a] -> [a] -> Bool
+check xs ys = xs == ys
 \end{code}
 \eeb{}
+
 \end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Type classes}
+In Scala, type classes are ``encoded'' using traits and implicit
+definitions, i.e. {\tt implicit val}, {\tt implicit def} and {\tt
+  implicit object}
+\beb{}
+\begin{code}
+trait Eq[A] {  def eq(x:A,y:A):Boolean }
+implicit val eqInt = new Eq[Int] {
+    def eq(x:Int,y:Int):Boolean =  x == y
+}
+implicit def eqList[A](implicit ev:Eq[A]) = 
+  new Eq[List[A]] {
+    def eq(xs:List[A],ys:List[A]):Boolean = 
+      (xs,ys) match {
+        case (Nil,Nil) => true
+        case (Nil, _ ) => false
+        case (_,  Nil) => false
+        case (x::xs_, y::ys_) => ev.eq(x,y) && eq(xs_,ys_)
+     }
+}
+
+def check[A](x:List[A], y:List[A])(implicit eqList:Eq[List[A]]) = 
+   eqList.eq(x,y) 
+\end{code}
+\eeb
+\end{frame}
+
+
 
 
 \end{document}
