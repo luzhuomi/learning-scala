@@ -701,9 +701,48 @@ object Function { // this is like a package
 
 In Scala there is a clear distinction between functions and methods.
 \begin{itemize}
-\item Methods are assocated with objects, e.g. {\tt l.map} and {\tt l.fold}
-\item Functions are not associated with any objects, but they are implementations of the 
+\item Methods are introduced by {\tt def} keyword, e.g. 
+\begin{code}
+scala> def f(x:Int) = x
+f: (x: Int)Int
+\end{code}
+\item Functions are implementations of the 
 {\tt Function}X traits. e.g. lambda expressions are functions. 
+\begin{code}
+scala> val g = (x:Int) => x
+g: Int => Int = <function1>
+\end{code}
+\item Simiilarity: Both can be used as argument and results
+\begin{code}
+scala> List(1,2).map (f) == List(1,2).map (g)
+res2: Boolean = true
+\end{code}
+\end{itemize}
+
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Functions vs methods}
+
+In Scala there is a clear distinction between functions and methods.
+\begin{itemize}
+\item Difference: methods do not possess combinators
+\begin{code}
+scala> f compose g
+<console>:10: error: missing arguments for method f;
+follow this method with `_' if you want to treat it as 
+a partially applied function
+              f compose g
+              ^
+scala> g compose f
+res1: Int => Int = <function1>
+\end{code}
+\item To convert a method to a function.
+\begin{code}
+scala> f _
+res1: Int => Int = <function1>
+\end{code}
 \end{itemize}
 
 \end{frame}
@@ -712,7 +751,7 @@ In Scala there is a clear distinction between functions and methods.
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Partial function}
+\frametitle{Partial functions}
 There are times we need to deal with partial function, naturally, we
 can use the {\tt Option} type in Scala (similar to {\tt Maybe} in
 Haskell).
@@ -743,7 +782,7 @@ yields {\tt List(2,1)}
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Partial function}
+\frametitle{Partial functions}
 Alternatively, we may use the Scala bultin PartialFunction 
 \beb{}
 \begin{code}
@@ -765,7 +804,7 @@ Will result in a {\tt scala.MatchError}
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Partial function}
+\frametitle{Partial functions}
 Alternatively, we may use the Scala bultin PartialFunction 
 \beb{}
 \begin{code}
@@ -781,5 +820,94 @@ val ys = List(0,1,2) map ( div(2) orElse mkZero )
 \eeb
 yields in a {\tt List(0, 2, 1)}
 \end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Implicit functions}
+Implicit function and implicit parameter allow us to define a default behavior.
+\beb{}
+\begin{code}
+implicit def logger(mesg:String):Unit = { 
+    println("[Log] " + mesg)
+}
+
+def fib(x:Int)(implicit log:String=>Unit):Int = {
+  x match  {
+    case 0 => 0
+    case 1 => 1
+    case _ => {
+      log("computing fib(" + x +")")
+      fib(x-1) + fib(x-2)         
+    }
+  }
+}
+\end{code}
+\eeb
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Implicit functions}
+
+\begin{code}
+scala> fib(5)
+[Log] computing fib(5)
+[Log] computing fib(4)
+[Log] computing fib(3)
+[Log] computing fib(2)
+[Log] computing fib(2)
+[Log] computing fib(3)
+[Log] computing fib(2)
+res7: Int = 5
+scala> fib(5)( x => Unit) 
+res8: Int = 5
+\end{code}
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Implicit functions}
+Scala resolves implicit parameters as follows,
+\begin{enumerate}
+\item Search in current scope
+  \begin{enumerate}
+  \item Implicits defined in current scope
+  \item Implicits defined in Explicit imports
+  \item Implicits defined in wildcard imports
+  \end{enumerate}
+\item Search for associated types in
+  \begin{enumerate}
+  \item Companion objects of a type
+  \item Implicit scope of an argument's type 
+  \item Outer objects for nested types
+  \item Other dimensions
+  \end{enumerate}
+\end{enumerate}
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Type classes}
+
+Type classes was introduced in Haskell to allow mixing parametric
+polymorphism and ad-hoc polymorphism.
+\beb{Haskell Type Class Example}
+\begin{code}
+class Eq a where 
+  (==) :: a -> a -> Bool
+
+instance Eq Int where
+  (==) x y = eqInt x y
+
+instance Eq a => Eq [a] where
+  (==) [] [] = True
+  (==) [] _  = False
+  (==) _ []  = False
+  (==) (x:xs) (y:ys) = (x == y) && (xs == ys)
+\end{code}
+\eeb{}
+\end{frame}
+
+
 \end{document}
 
