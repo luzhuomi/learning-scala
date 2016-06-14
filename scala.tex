@@ -699,6 +699,13 @@ object Function { // this is like a package
 \begin{frame}[fragile]
 \frametitle{Functions vs methods}
 
+In Scala there is a clear distinction between functions and methods.
+\begin{itemize}
+\item Methods are assocated with objects, e.g. {\tt l.map} and {\tt l.fold}
+\item Functions are not associated with any objects, but they are implementations of the 
+{\tt Function}X traits. e.g. lambda expressions are functions. 
+\end{itemize}
+
 \end{frame}
 
 
@@ -746,8 +753,33 @@ def div(x:Int): PartialFunction[Int,Int] = {
 val xs = List(0,1,2) collect ( div(2) ) 
 \end{code}
 \eeb
-yields {\tt List(2, 1)} \\ 
-Note that we use the {\tt collect} method instead of {\tt map}
+yields {\tt List(2, 1)}. \\ 
+Note that we have to use the {\tt collect} method instead of {\tt map} 
+\beb{}
+\begin{code}
+val ys = List(0,1,2) map ( div(2) ) 
+\end{code}
+\eeb
+Will result in a {\tt scala.MatchError}
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Partial function}
+Alternatively, we may use the Scala bultin PartialFunction 
+\beb{}
+\begin{code}
+def div(x:Int): PartialFunction[Int,Int] = {
+    case (y:Int) if y != 0 => x/y
+}
+
+val mkZero: PartialFunction[Int,Int] = {
+  case (y:Int) if y == 0 => 0
+}
+val ys = List(0,1,2) map ( div(2) orElse mkZero ) 
+\end{code}
+\eeb
+yields in a {\tt List(0, 2, 1)}
 \end{frame}
 \end{document}
 
