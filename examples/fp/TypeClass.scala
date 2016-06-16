@@ -10,11 +10,11 @@ object TypeClass {
 		}
 	}
 	implicit def eqList[A](implicit ev:Eq[A]) = new Eq[List[A]] {
+	// OR implicit class eqList[A](ev:Eq[A]) extends Eq[List[A]] {	
 		def eq(xs:List[A],ys:List[A]):Boolean = (xs,ys) match {
 			case (Nil,Nil) => true
-			case (Nil, _ ) => false
-			case (_,  Nil) => false
-			case (x::xs_, y::ys_) => ev.eq(x,y) && eq(xs_,ys_)
+			case (x::xs2, y::ys2) => ev.eq(x,y) && eq(xs2,ys2)
+			case (_, _) => false
 		}
 	}
 

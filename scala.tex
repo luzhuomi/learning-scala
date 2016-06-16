@@ -110,12 +110,12 @@ width=7cm, minimum height=7cm,text centered, draw=black]
  \item Functional Programming 
  \begin{itemize}
  \item Algebraic Data Type and pattern matching
- \item Higher order function
- \item Partial function
- \item Implicit function
- \item Traits and Type classes
+ \item Higher order functions
+ \item Partial functions
+ \item Implicit functions
+ \item Type classes
  \item Monads
- \item Paralellism
+ \item Parallelism
  \item Actors
  \end{itemize}
 \end{itemize}
@@ -901,9 +901,8 @@ instance Eq Int where
 
 instance Eq a => Eq [a] where
   (==) [] [] = True
-  (==) [] _  = False
-  (==) _ []  = False
   (==) (x:xs) (y:ys) = (x == y) && (xs == ys)
+  (==) _ _ = False
 
 check :: (Eq a) => [a] -> [a] -> Bool
 check xs ys = xs == ys
@@ -929,18 +928,210 @@ implicit def eqList[A](implicit ev:Eq[A]) =
     def eq(xs:List[A],ys:List[A]):Boolean = 
       (xs,ys) match {
         case (Nil,Nil) => true
-        case (Nil, _ ) => false
-        case (_,  Nil) => false
-        case (x::xs_, y::ys_) => ev.eq(x,y) && eq(xs_,ys_)
+        case (x::xs2, y::ys2) => ev.eq(x,y) && eq(xs2,ys2)
+        case (_, _) => false
      }
 }
-
-def check[A](x:List[A], y:List[A])(implicit eqList:Eq[List[A]]) = 
-   eqList.eq(x,y) 
 \end{code}
 \eeb
 \end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Type classes}
+By resolving implicit parameter the compiler builds the ``evidence''
+{\tt ev} AKA the dictionary.
+\beb{}
+\begin{code}
+def check[A](x:List[A], y:List[A])
+   (implicit ev:Eq[List[A]]) = ev.eq(x,y) 
+\end{code}
+\eeb
+\begin{code}
+scala> check(List(1,2,3), List(1,2,3))
+res6: Boolean = true
+\end{code}
+The above builds the evidence {\tt ev = eqList(eqInt)}
 
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Type classes}
+For real world application, we do not define all the type classes from
+the scratch. We use a library project called {\tt scalaz}.
+\url{https://github.com/scalaz/scalaz} which provides many useful type classes.
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+A vague analogy 
+\begin{itemize}
+\item Algebraic data types define abstractions of run-time data (or
+  values), i.e. what are the possible values.
+\item Monads define abstractions of {\em computations}, i.e. what the
+  possible computations.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+Let's model safe arithmetic computation
+\beb{}
+\begin{code}
+sealed trait SafeVal[+T] 
+case class Val[T](x:T) extends SafeVal[T]
+case class Err(msg:String) extends SafeVal[Nothing]
+
+type SafeInt = SafeVal[Int]
+\end{code}
+\eeb{}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+\beb{}
+\begin{code}
+def add(x:SafeInt, y:SafeInt):SafeInt = x match {
+  case Err(msg) => Err(msg)
+  case Val(i) => y match {
+    case Err(msg) => Err(msg)
+    case Val(j) => Val(i + j)
+  }
+}
+def div(x:SafeInt, y:SafeInt):SafeInt = x match  {
+  case Err(msg) => Err(msg)
+  case Val(i) => y match {
+    case Err(msg) => Err(msg)
+    case Val(j) => { 
+        if (j == 0) {Err("div by 0")} else {Val (i/j)}
+    }
+  }
+}
+\end{code}
+\eeb{}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+We spot many similar code structure, let's rewrite them in terms of
+some higher order combinators {\tt pnt} and {\tt bnd}.
+\beb{}
+\begin{code}
+def pnt[A](x: => A):SafeVal[A] = Val(x)
+def bnd[A,B](sa: SafeVal[A])
+  (f: A => SafeVal[B]): SafeVal[B] = sa match {
+  case Err(msg) => Err(msg)
+  case Val(a)   => f(a)
+}
+\end{code}
+\eeb{}
+\begin{itemize}
+\item Note that {\tt x:=> A} defines a {\em lazy} formal parameter {\tt x}
+of type {\tt A}.
+\item {\tt pnt} ``lifts'' / ``injects'' a value into the {\tt SafeVal}
+  object.
+\item {\tt bnd} ``composes'' the previous {\tt SafeVal} with the
+  subsequent computation.
+\end{itemize}
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+\beb{}
+\begin{code}
+def add(x:SafeInt, y:SafeInt):SafeInt = {
+  bnd(x)(x1 => { 
+    bnd(y)(y1 => pnt(x1+y1))
+  })
+}
+def div(x:SafeInt, y:SafeInt):SafeInt = {
+  bnd(x)( x1 => {
+    bnd(y)( y1 => {
+      if (y1 == 0) { Err("div by 0") }
+      else { pnt(x1 / y1) }
+    })
+  })
+}
+\end{code}
+\eeb{}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+If we use type class {\tt Monad} and {\tt MonadPlus} provided by
+scalaz, we can make it even more concise. 
+\beb{}
+\begin{code}
+implicit object safeValMonadPlus 
+  extends MonadPlus[SafeVal] {
+  override def point[A](a: => A):SafeVal[A] = Val(a)
+  override def bind[A, B](sa: SafeVal[A])
+  (f: A => SafeVal[B]): SafeVal[B] = sa match {
+    case Err(msg) => Err(msg)
+    case Val(a)   => f(a)
+  } 
+ ... 
+}
+\end{code}
+\eeb{}
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Monads}
+\beb{}
+\begin{code}
+def add(x:SafeInt,y:SafeInt):SafeInt = {
+  for ( x1 <- x
+  ; y1 <- y
+  ) yield (x1 + y1)
+}
+def div(x:SafeInt,y:SafeInt):SafeInt = {
+  for ( x1 <- x
+  ; y1 <- y
+  ; if y1 != 0
+  ) yield (x1 / y1)
+}
+\end{code}
+\eeb{}
+Roughly speaking, {\tt for (x <- e1 ; e2)} is desugared to 
+{\tt bind(e1)(x => e2)}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+
+There many types of commonly used monads
+\begin{itemize}
+ \item List monad - list traversal and aggregate computation.
+ \item State monad - computation with explicit state passing
+ \item Reader monad - input scanning computation
+\end{itemize}
+Monads are composable via monad trasformer. 
+\end{frame}
+
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Actors}
+
+\end{frame}
 
 
 
