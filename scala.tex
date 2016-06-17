@@ -9,27 +9,6 @@
 %\usepackage{proof}
 \usepackage{theorem}
 \usepackage{pstricks} 
-
-
-\usepackage{tikz}
-\usetikzlibrary{shapes.geometric, arrows, shapes}
-
-\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=1.5cm, minimum height=0.5cm,text centered, draw=black]
-\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=1.5cm, minimum height=0.5cm, text centered, draw=black]
-\tikzstyle{process} = [rectangle, minimum width=1.5cm, minimum height=0.5cm, text centered, draw=black]
-\tikzstyle{decision} = [diamond, minimum width=1.5cm, minimum height=0.5cm, text centered, draw=black, aspect=3]
-\tikzstyle{arrow} = [thick,->,>=stealth]
-\tikzstyle{doublearrow} = [thick,<->,>=stealth]
-\tikzstyle{db} = [cylinder, shape border rotate=90, draw,minimum
-height=1.5cm, minimum width=2cm, aspect=0.3]
-\tikzstyle{www} = [cloud, cloud puffs=15.7, cloud ignores
-aspect,minimum width=5cm, minimum height=2cm, align=center, draw]
-\tikzstyle{blank} = [rectangle] 
-\tikzstyle{container} = [rectangle, rounded corners, minimum
-width=7cm, minimum height=7cm,text centered, draw=black]
-
-\tikzstyle{darrow} = [thick,<->,>=stealth]
-
 \usepackage{listings}
 
 \include{macros-ms}
@@ -107,8 +86,8 @@ width=7cm, minimum height=7cm,text centered, draw=black]
 \frametitle{Learning outcomes}
 By the end of this lecture, you will have some basic understanding on
 \begin{itemize}
- \item Object Oriented Programming 
- \item Functional Programming 
+ \item Object Oriented Programming in Scala
+ \item Functional Programming in Scala
  \begin{itemize}
  \item Algebraic data type and pattern matching
  \item Higher order functions
@@ -117,8 +96,8 @@ By the end of this lecture, you will have some basic understanding on
  \item Type classes
  \item Monads
 \end{itemize}
- \item Data parallelism
- \item Concurrent programming with threads and actors
+ \item Data parallelism in Scala
+ \item Concurrent programming in Scala with threads and actors
 \end{itemize}
 \end{frame}
 
@@ -307,12 +286,17 @@ woohoo
 \begin{frame}[fragile]
 \frametitle{Functional Programming in Scala}
 
-OOP is useful, but not Interesting, let's consider the FP features in Scala.
-
-
+OOP is useful, but often less interesting, let's consider the FP
+features in Scala. \\
+\center{
+\includegraphics[height=6cm]{pics/toptal-blog-image-1409691715906.png}
+}
+\\ 
+{\scriptsize Image taken from \url{https://www.toptal.com/scala/why-should-i-learn-scala}}
 \end{frame}
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
+\ignore{ % audience might have forgotten Haskell
 \begin{frame}[fragile]
 \frametitle{Algebraic Data Type}
 Recall the Haskell example
@@ -345,6 +329,7 @@ simp (Plus e1 e2) = Plus (simp e1) (simp e2)
 \end{code}
 \eeb
 \end{frame}
+}
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
@@ -372,6 +357,41 @@ def simp(e:Exp):Exp = e match {
 
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Algebraic Data Type} 
+In Java, to achieve the above we have to use abstract class and method
+overriding. (For brevity, setter and getter methods are omitted.)
+{\scriptsize
+\beb{}
+\begin{code}
+public abstract class Exp { public abstract Exp simp(); }
+public class Val extends Exp {
+  private int v;
+  public Val(int v) { this.v = v; }
+  public Exp simp() { return this; }
+}
+public class Plus extends Exp {
+  private Exp e1;  private Exp e2;
+  public Plus(Exp e1, Exp e2) { 
+    this.e1 = e1; this.e2 = e2;
+  }
+  public Exp simp() {
+    if (e1 instanceof Val) {
+      Val v1 = (Val)e1;
+      if (v1.getV() == 0) { return e2; }
+    }
+    return new Plus(e1.simp(),e2.simp());
+  }
+}
+\end{code}
+\eeb
+}
+\end{frame}
+
+
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
 \ignore{
 \begin{frame}[fragile]
 \frametitle{Algebraic Data Type}
@@ -396,6 +416,8 @@ def simpFix(e:Exp):Exp = {
 
 \begin{frame}[fragile]
 \frametitle{List}
+Algebraic data type and pattern matching are useful in case of
+handling recursive/nested data structures, e.g. a linked list.
 \beb{}
 \begin{code}
 sealed trait List[A]
@@ -460,6 +482,16 @@ def length[A](l:List[A]):Int = l match {
    case Nil => 0
    case (_::xs) => 1 + length(xs)
 }
+\end{code}
+\eeb
+which is equivalent to the following Haskell program
+\beb{}
+\begin{code}
+x = [1,2]
+length :: [a] -> Int 
+length l = case l of 
+   [] -> 0
+   (_:xs) -> 1 + length xs
 \end{code}
 \eeb
 \end{frame}
@@ -589,6 +621,13 @@ shortened as {\tt \_ * 2}. The {\tt .} is optional.
 val l2 = l map (_*2) 
 \end{code}
 \eeb
+which is equivalent to the following Haskell program
+\beb{}
+\begin{code}
+l = [1,2,3,4]
+l2 = map (\x -> x*2) l
+\end{code}
+\eeb
 \end{frame}
 
 %-------------------------------------------------------------------
@@ -629,23 +668,29 @@ In essence the above is computing
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
 \frametitle{Higher order function}
-Let's consider the defintion of {\tt map}.
-
+The defintion of {\tt map}.
 \beb{}
 \begin{code}
-object List { // this is like a package
-    sealed trait List[+A] {
-        def map[B](f:A=>B):List[B] = this match {
-            case Nil => Nil
-            case Cons(x,xs) => Cons(f(x),xs.map(f))
-        }
+  sealed trait List[+A] {
+    def map[B](f:A=>B):List[B] = this match {
+      case Nil => Nil
+      case x::xs => f(x)::xs.map(f)
     }
-    case object Nil extends List[Nothing]
-    case class Cons[A](x:A, xs:List[A]) extends List[A]
-}
+  }
+  case object Nil extends List[Nothing]
+  case class Cons[A](x:A, xs:List[A]) extends List[A]
 \end{code}
 \eeb
-Function {\tt f:A=>B} is used as a formal argument.
+Function {\tt f:A=>B} is used as a formal argument. \\
+Equivalently, in Haskell, we have.
+\beb{}
+\begin{code}
+map :: (a -> b) -> [a] -> [b] 
+map f [] = [] 
+map f (x:xs) = (f x):(map f xs)
+\end{code}
+\eeb
+
 \end{frame}
 
 %-------------------------------------------------------------------
@@ -692,7 +737,7 @@ object Function { // this is like a package
 }
 \end{code}
 \eeb
-
+Both {\tt compose} and {\tt andThen} return functions as results.
 \end{frame}
 
 
@@ -714,7 +759,7 @@ f: (x: Int)Int
 scala> val g = (x:Int) => x
 g: Int => Int = <function1>
 \end{code}
-\item Simiilarity: Both can be used as argument and results
+\item Simiilarity: both can be used as argument and results
 \begin{code}
 scala> List(1,2).map (f) == List(1,2).map (g)
 res2: Boolean = true
@@ -733,8 +778,8 @@ In Scala there is a clear distinction between functions and methods.
 \begin{code}
 scala> f compose g
 <console>:10: error: missing arguments for method f;
-follow this method with `_' if you want to treat it as 
-a partially applied function
+follow this method with `_' if you want to treat it 
+as a partially applied function
               f compose g
               ^
 scala> g compose f
@@ -754,8 +799,8 @@ res1: Int => Int = <function1>
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
 \frametitle{Partial functions}
-There are times we need to deal with partial function, naturally, we
-can use the {\tt Option} type in Scala (similar to {\tt Maybe} in
+There are situations in which we need to deal with partial functions, naturally, we
+can use the {\tt Option} type in Scala (similar to the {\tt Maybe} type in
 Haskell).
 \beb{}
 \begin{code}
@@ -807,7 +852,8 @@ Will result in a {\tt scala.MatchError}
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
 \frametitle{Partial functions}
-Alternatively, we may use the Scala bultin PartialFunction 
+{\tt orElse} allows us to compose partial functions which are
+complimenting on their domains.
 \beb{}
 \begin{code}
 def div(x:Int): PartialFunction[Int,Int] = {
@@ -826,7 +872,7 @@ yields in a {\tt List(0, 2, 1)}
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
 \frametitle{Implicit functions}
-Implicit function and implicit parameter allow us to define a default behavior.
+Implicit function and implicit parameter allow us to define default behaviors.
 \beb{}
 \begin{code}
 implicit def logger(mesg:String):Unit = { 
@@ -960,7 +1006,95 @@ The above builds the evidence {\tt ev = eqList(eqInt)}
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
 \frametitle{Type classes}
-For real world application, we do not define all the type classes from
+To mimick type classes' effect in OOP
+languages like Java, we would have to use
+interface and function overriding with lots of cares. (We omit the
+getter and setter methods for brevity.)
+{\scriptsize
+\beb{}
+\begin{code}
+public interface Eq<T> { public boolean eq(T that); }
+public class Int implements Eq<Int> {
+  private int val;
+  public Int(int x) { val = x; }
+  public boolean eq(Int that) {
+    return (val == that.getVal());
+  } 
+}
+public class List<T extends Eq<T>> implements Eq<List<T>> {
+  private Node<T> pHead; 
+  public List() { pHead = null;}
+  public void insert(T v) {
+    Node<T> n = new Node<T>(v);
+    n.setNext(pHead);
+    pHead = n;
+  }
+  public boolean eq(List<T> that) {
+    return pHead.eq(that.getPHead());
+  }
+}
+\end{code}
+\eeb
+}
+\end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Type classes}
+To mimick type classes' effect in OOP
+languages like Java, we would have to use
+interface and function overriding with lots of cares. (We omit the
+getter and setter methods for brevity.)
+{\scriptsize
+\beb{}
+\begin{code}
+public class Node<T extends Eq<T>> implements Eq<Node<T>> {
+  private T val;
+  private Node<T> next;
+  public Node(T v) { 
+    val = v;
+    next = null;
+  }
+  public boolean eq(Node<T> that) {
+    if (!val.eq(that.getVal())) { return false; }
+    else {
+      if ((next == null) && (that.getNext() == null)) { return true; }
+      else if ((next == null) && (that.getNext() != null)) { return false; }			
+      else if ((next != null) && (that.getNext() == null)) { return false; } 
+      else { return next.eq(that.getNext()); }
+    } 
+  } 
+}
+\end{code}
+\eeb
+}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Type classes}
+To mimick type classes' effect in OOP
+languages like Java, we would have to use
+interface and function overriding with lots of cares. 
+\\
+Finally we can implement the {\tt check} function in Java as follows,
+{\scriptsize
+\beb{}
+\begin{code}
+ public static <T extends Eq<T>> boolean check(List<T> l1, List<T> l2) {
+    return l1.eq(l2);
+ }
+\end{code}
+\eeb
+}
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Type classes}
+For real world applications implemented in Scala, we do not define all the type classes from
 the scratch. We use a library project called {\tt scalaz}.
 \url{https://github.com/scalaz/scalaz} which provides many useful type classes.
 \end{frame}
@@ -1112,6 +1246,45 @@ def div(x:SafeInt,y:SafeInt):SafeInt = {
 Roughly speaking, {\tt for (x <- e1 ; e2)} is desugared to 
 {\tt bind(e1)(x => e2)}
 \end{frame}
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+So you still want to see how to mimick monads in Java?
+
+\end{frame}
+
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+
+Are you really sure?
+
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+
+\huge{Are you REALLY sure?}
+
+\end{frame}
+
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+
+Ok, if you are really interested, look here. \\
+\url{http://github.com/luzhuomi/parsecj/tree/master/Parsec/src/parsec}
+
+\end{frame}
+
+
 
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
@@ -1156,7 +1329,7 @@ sys	0m0.059s
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
 \frametitle{Data Parallelism}
-{\tt .par} converts a sequentials data collection into a paralleled
+{\tt .par} converts a sequentials data collection into a parallel
 counter part. {\tt .seq} has the opposite effect.
 \beb{}
 \begin{code}
@@ -1188,8 +1361,8 @@ sys	0m0.061s
 
 \begin{itemize}
 \item Multi-threading
-\item Async computation
 \item Actors
+\item Async computation via Future
 \end{itemize}
 
 \end{frame}
