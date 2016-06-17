@@ -1,3 +1,4 @@
+// show connection with Java and method overriding
 sealed trait Exp
 case class Val(v:Int) extends Exp
 case class Plus(e1:Exp, e2:Exp) extends Exp
