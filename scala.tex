@@ -1131,12 +1131,21 @@ A vague analogy
 \item Monads define abstractions of {\em computations}, i.e. what the
   possible computations.
 \end{itemize}
+So what is monad good for? 
+\begin{itemize}
+\item segregating pure computation from computation with side-effect,
+  (i.e. i/o)
+\item capture program control flow
+\item generic data traversal
+\item define user-programmable states and transitions
+\item compose computations
+\end{itemize}
 \end{frame}
 
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Monads}
+\frametitle{Monad example: Safe Integer arithmetics}
 Let's model safe arithmetic computation
 \beb{}
 \begin{code}
@@ -1152,7 +1161,7 @@ type SafeInt = SafeVal[Int]
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Monads}
+\frametitle{Monad example: Safe Integer arithmetics}
 \beb{}
 \begin{code}
 def add(x:SafeInt, y:SafeInt):SafeInt = x match {
@@ -1178,7 +1187,7 @@ def div(x:SafeInt, y:SafeInt):SafeInt = x match  {
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Monads}
+\frametitle{Monad example: Safe Integer arithmetics}
 We spot many similar code structure, let's rewrite them in terms of
 some higher order combinators {\tt pnt} and {\tt bnd}.
 \beb{}
@@ -1203,7 +1212,7 @@ of type {\tt A}.
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Monads}
+\frametitle{Monad example: Safe Integer arithmetics}
 \beb{}
 \begin{code}
 def add(x:SafeInt, y:SafeInt):SafeInt = {
@@ -1226,7 +1235,7 @@ def div(x:SafeInt, y:SafeInt):SafeInt = {
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Monads}
+\frametitle{Monad example: Safe Integer arithmetics}
 If we use type classes {\tt Monad} and {\tt MonadPlus} provided by
 scalaz, we can make it even more concise. 
 \beb{}
@@ -1248,7 +1257,7 @@ implicit object safeValMonadPlus
 %-------------------------------------------------------------------
 
 \begin{frame}[fragile]
-\frametitle{Monads}
+\frametitle{Monad example: Safe Integer arithmetics}
 \beb{}
 \begin{code}
 def add(x:SafeInt,y:SafeInt):SafeInt = {
@@ -1266,6 +1275,64 @@ def div(x:SafeInt,y:SafeInt):SafeInt = {
 \eeb{}
 Roughly speaking, {\tt for (x <- e1 ; e2)} is desugared to 
 {\tt bind(e1)(x => e2)}
+\end{frame}
+
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Monad example: Matrix multiplication}
+Given
+\beb{}
+\begin{code}
+val l1 = List(1,2,3)
+val l2 = List('a','b')
+\end{code}
+\eeb
+We want to define the matrix multiplication {\tt mult} 
+\begin{code}
+scala> mult(l1,l2)
+res0: List[(Int, Char)] = List((1,a), (1,b), (2,a), (2,b), (3,a),
+(3,b))
+\end{code}
+\beb{}
+\begin{code}
+def mult[A,B](as:List[A], bs:List[B]):List[(A,B)] = {
+  as flatMap ( a => 
+  bs map ( b => (a,b) )
+  )
+}
+\end{code}
+\eeb{}
+Note {\tt List(List(1),List(2)).flat} yields {\tt List(1,2)}. {\tt flatMap}
+is defined as the composition of {\tt flat} and {\tt map}.
+\end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{Monad example: Matrix multiplication}
+List is a monad,
+\beb{As defined in the scalaz library}
+\begin{code}
+implicit object listMonadPlus extends MonadPlus[List] {
+  override def point[A](a: => A):List[A] = List(a)
+  override def bind[A, B](sa: List[A])
+     (f: A => List[B]): List[B] = sa flatMap f
+...
+}
+\end{code}
+\eeb
+\beb{What a programmer needs to write}
+\begin{code}
+def mult[A,B](as:List[A], bs:List[B]) : List[(A,B)] = for 
+  ( a <- as
+  ; b <- bs
+  ) yield (a,b)
+\end{code}
+\eeb{}
 \end{frame}
 
 %-------------------------------------------------------------------
