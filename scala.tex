@@ -112,8 +112,8 @@ A general purpose programming language that is
  \item Object Oriented and Functional
  \item with distributed programming builtin
  \item with a rich type system and a huge set of libraries and eco-systems
- \item Widely used in research institutes (e.g. Spark) and industries
-   (e.g. Twitter, Linkedin, Coursera Walmart, ... )
+ \item Widely used in academic research projects (e.g. Spark was from
+   UC Berkeley) and industries   (e.g. Scalding from Twitter, Kakfa from Linkedin, Coursera Walmart, ... )
 \end{itemize}
 \end{frame}
 
@@ -1267,6 +1267,22 @@ def div(x:SafeInt,y:SafeInt):SafeInt = {
 Roughly speaking, {\tt for (x <- e1 ; e2)} is desugared to 
 {\tt bind(e1)(x => e2)}
 \end{frame}
+
+%-------------------------------------------------------------------
+%-------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Monads}
+There many types of commonly used monads
+\begin{itemize}
+ \item List monad - list traversal and aggregate computation.
+ \item State monad - computation with explicit state passing
+ \item Reader monad - input scanning computation
+ \item Monadic parser combinator - LL-style top-down parsing computation 
+\end{itemize}
+Monads are composable via monad trasformer. 
+\end{frame}
+
+
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
@@ -1280,17 +1296,11 @@ So you still want to see how to mimick monads in Java?
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
 \frametitle{Monads}
-
-Are you really sure?
-
-\end{frame}
-
-%-------------------------------------------------------------------
-%-------------------------------------------------------------------
-\begin{frame}[fragile]
-\frametitle{Monads}
-
-\huge{Are you REALLY sure?}
+\center{
+\includegraphics[height=7cm]{pics/areyousure.png}
+}
+\\
+{\scriptsize Image taken from \url{http://quickmeme.com}}
 
 \end{frame}
 
@@ -1307,18 +1317,6 @@ Ok, if you are really interested, look here. \\
 
 
 
-%-------------------------------------------------------------------
-%-------------------------------------------------------------------
-\begin{frame}[fragile]
-\frametitle{Monads}
-There many types of commonly used monads
-\begin{itemize}
- \item List monad - list traversal and aggregate computation.
- \item State monad - computation with explicit state passing
- \item Reader monad - input scanning computation
-\end{itemize}
-Monads are composable via monad trasformer. 
-\end{frame}
 %-------------------------------------------------------------------
 %-------------------------------------------------------------------
 \begin{frame}[fragile]
