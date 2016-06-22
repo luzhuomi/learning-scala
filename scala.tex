@@ -564,7 +564,7 @@ val len = l1.length // 3
 \beb{Concatenation}
 \begin{code}
 val l2 = List(-1,-2,-3)
-val l3 = l1 ++ l2 // List(1,2,3,-1,-2,3)
+val l3 = l1 ++ l2 // List(1,2,3,-1,-2,-3)
 \end{code}
 \eeb
 \beb{Reverse}
@@ -588,14 +588,14 @@ val max = l1.max // 3
 \eeb
 \beb{sorting}
 \begin{code}
-// recall l3 = List(1,2,3,-1,-2,3)
+// recall l3 = List(1,2,3,-1,-2,-3)
 val sl3 = l3.sortWith(_<_) // List(-3, -2, -1, 1, 2, 3)
 // we will look into _<_ in a short while.
 \end{code}
 \eeb
 \beb{sub-list}
 \begin{code}
-val sl3a = sl3.take(3) // List(-3,-2,1)
+val sl3a = sl3.take(3) // List(-3,-2,-1)
 val sl3b = sl3.drop(3) // List(1,2,3)
 \end{code}
 \eeb
@@ -973,7 +973,7 @@ instance Eq a => Eq [a] where
   (==) (x:xs) (y:ys) = (x == y) && (xs == ys)
   (==) _ _ = False
 
-check :: (Eq a) => [a] -> [a] -> Bool
+check :: (Eq [a]) => [a] -> [a] -> Bool
 check xs ys = xs == ys
 \end{code}
 \eeb{}
@@ -1293,8 +1293,8 @@ val l2 = List('a','b')
 We want to define the matrix multiplication {\tt mult} 
 \begin{code}
 scala> mult(l1,l2)
-res0: List[(Int, Char)] = List((1,a), (1,b), (2,a), (2,b), (3,a),
-(3,b))
+res0: List[(Int, Char)] = List((1,a), (1,b), (2,a), (2,b),
+ (3,a),(3,b))
 \end{code}
 \beb{}
 \begin{code}
