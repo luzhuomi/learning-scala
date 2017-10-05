@@ -1,0 +1,472 @@
+\documentclass[10pt]{article}
+
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{code}
+\usepackage{graphicx}
+
+\usepackage{listings}
+
+
+
+\usepackage[english]{babel}
+%\usepackage{blindtext}
+%\usepackage{fontspec}
+%\setmainfont{Arial}
+
+%\renewcommand{\familydefault}{\sfdefault}
+%\usepackage{blindtext}
+\pagenumbering{arabic}  % Arabic page numbers GM July 2000
+
+\usepackage{authoraftertitle}
+\usepackage{fancyhdr}
+% Clear the header and footer
+\fancyhead{}
+\fancyfoot{}
+%\lhead{\includegraphics[height=0.7cm]{../logo/nyp-logo-int.png} }
+\rhead{\scriptsize \MyTitle}
+%\lfoot{\scriptsize Specialist Diploma in Business \& Big Data Analytics\\ Copyright
+%  \copyright\ Nanyang Polytechnic. All Rights Reserved.}
+\rfoot{\thepage}
+\pagestyle{fancy}
+
+
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\textfraction}{0.02}
+\renewcommand{\floatpagefraction}{0.95}
+
+
+\bibliographystyle{plain}
+
+%%\textwidth      150mm \textheight     210mm \oddsidemargin  -2mm \evensidemargin -2mm
+
+\renewcommand{\baselinestretch}{0.987}
+
+\setlength{\parskip}{0.0in}
+
+
+\newcommand{\Nturns}{\, \vdash_{\mbox{\scriptsize lnf}} \,}
+
+\newcommand{\tr}[1]{}
+%%\newcommand{\tr}[1]{#1}
+%%\newcommand{\nottr}[1]{#1}
+\newcommand{\nottr}[1]{}
+
+%\newcommand{\implies}{\supset}
+\newcommand{\clabel}[1]{\mbox{(#1)}}
+\newcommand{\rat}[1]{\rightarrowtail_{#1}}
+\newcommand{\arr}{\rightarrow}
+\newcommand{\arrow}{\rightarrow}
+\newcommand{\Arr}{\Rightarrow}
+\newcommand{\atsign}{@}
+\newcommand{\simparrow}[0]{\Longleftrightarrow}
+\newcommand{\proparrow}[0]{\Longrightarrow}
+\newcommand{\comment}[1]{}
+\newcommand{\ignore}[1]{}
+%\newcommand{\kl}[1]{{\bf KL:#1}} %%%{\marginpar{\sc kl}{\bf #1}}
+\newcommand{\kl}[1]{}
+\newcommand{\ms}[1]{{\bf MS:#1}}       %%{\marginpar{\sc ms}{\bf #1}}
+%%\newcommand{\jw}[1]{\marginpar{\sc jw}{\bf #1}}
+%% \newcommand{\answer}[1]{#1}
+
+\newcommand{\pjs}[1]{}
+%%\newcommand{\ms}[1]{}
+\newcommand{\jw}[1]{}
+%%\newcommand{\kl}[1]{}
+
+
+\newcommand{\pow}{\^{}}
+\newcommand{\venv}{\Delta}
+\newcommand{\mleq}{\mbox{\tt leq}}
+\newcommand{\mmleq}{\leq}
+\newcommand{\mas}{\mbox{\tt as}}
+\newcommand{\mfix}{\mu}
+
+\newcommand{\mysection}[1]{\vspace*{-2mm}\section{#1}\vspace*{-1mm}}
+\newcommand{\mysubsection}[1]{\vspace*{-1mm}\subsection{#1}\vspace*{-1mm}}
+
+\newcounter{cnt}
+\newtheorem{ex}{Example}
+%\newenvironment{example}{
+%        \begin{ex}\rm}%
+%    {\hfill$\Box$\end{ex}}
+
+\newenvironment{nexample}{
+        \begin{ex}\rm}%
+        {\end{ex}}
+
+%%\newtheorem{rem}{Remark}
+%%\renewenvironment{remark}{
+%%        \begin{rem}\rm}%
+%%    {\hfill$\Box$\end{rem}}
+
+%%\newenvironment{myexample}{
+%%        \begin{ex}\rm}%
+%%  {\hfill $\Diamond$\end{ex}}
+%\newenvironment{example}{
+%        \begin{example}\rm}%
+%    {\end{example}}
+
+\newenvironment{ttline}{\begin{trivlist}\item \tt}{\end{trivlist}}
+\newenvironment{ttprog}{\begin{trivlist}\small\item \tt
+        \begin{tabbing}}{\end{tabbing}\end{trivlist}}
+
+
+\newcommand{\figcode}[1]
+        {\begin{figure*}[t]#1
+        \end{figure*}}
+
+
+\title{%ITD353 Massively Parallel Computing for Big Data \\
+  Introduction to Scala }
+%\author{Kenny Zhuo Ming Lu\\
+%  \multicolumn{1}{p{.7\textwidth}}{\centering
+%  \emph{School of Information Technology \\ Nanyang Polytechnic \\
+%    180 Ang Mo Kio Avenue 8, Singapore 569830}}
+%}
+
+
+\begin{document}
+\maketitle \makeatactive
+\thispagestyle{fancy}
+
+\lstset{language=Python}
+
+%\begin{abstract}
+%\end{abstract}
+
+
+\section{Learning Outcomes} \label{sec:aims}
+\begin{itemize}
+ \item Start Scala REPL in Scala application development
+ \item Execute and observe Scala programs Scala application
+   development
+ \item Comprehend all the Scala languages features and the program semantics when reviewing Scala source codes
+ \item Develop data transformation scripts using Scala
+\end{itemize}
+
+
+
+
+\section{Scala Features}
+\begin{enumerate}
+\item Scala is an \underline{o~~~~~~~~~~~~~~} oriented and \underline{f~~~~~~~~~~~~~~} language. 
+\item Scala is a \underline{~~~~~~~~~~~~~~} typed language.
+\end{enumerate}
+
+\section{First Scala Program - Hello World}
+\begin{enumerate}
+\item Check out the source codes.
+  \begin{enumerate}
+  \item go to Github and download the zip
+  \item Clone it from github.
+    \begin{code}
+      $ cd ~
+      $ mkdir git
+      $ cd git 
+      $ git clone http://github.com/luzhuomi/learning-scala.git
+      $ cd learning-scala/codes
+    \end{code}
+  \end{enumerate}
+\item Examine the script {\tt Script.scala}  in {\tt helloworld}.
+\item Execute the script with the following
+\begin{code}
+$ scala Script.scala
+\end{code}
+\item Examine the code {\tt Main.scala} in {\tt helloworld}.
+\item Compile the code
+\begin{code}
+$ scalac Main.scala
+\end{code}
+\item Execute the compiled code
+\begin{code}
+$ scala Main
+\end{code}
+\end{enumerate}
+
+\section{Scala REPL}
+\begin{enumerate}
+\item Start a terminal in Linux, type 
+ \begin{code}
+  $ scala
+  \end{code}
+ Note that the \$ sign is the command prompt, you should not include it as
+ part of the command.
+\item Exit python REPL by typing 
+ \begin{code}
+ scala> :quit
+ \end{code}
+ Note that the {\tt scala>} sign is the Scala REPL prompt, you should not include it as
+ part of the command.
+\end{enumerate}
+%$
+
+\section{Variables, Values and Assignment Statement}
+In a Scala REPL
+\begin{enumerate}
+\item Declare a variable with name ``first\_name'' and assign a string
+  value as ``robin''.
+\item Declare a value with name ``last\_name'' and assign a string
+  value as ``Williams''.
+\item Update the variable ``first\_name'' to a new string value
+  ``Robin''
+\item If you were to update the value ``last\_name'' to a new string
+  ``Hood'', what will happen?
+\end{enumerate}
+\comment{
+\subsection{Sample Answer}
+\begin{code}
+scala> var first_name = "robin"
+first_name: String = robin
+
+scala> val last_name = "Williams"
+last_name: String = Williams
+
+scala> first_name = "Robin"
+first_name: String = Robin
+
+scala> last_name = "Hood"
+<console>:12: error: reassignment to val
+       last_name = "Hood"
+                 ^
+\end{code}
+}
+\section{Print Statement}
+In a Scala REPL
+\begin{enumerate}
+\item Print the variable ``first\_name'' and value ``last\_name'' individually
+\item Use template, print the following
+\begin{code}
+Robin William (1951 - 2014) 
+\end{code}
+You need to make use of the variable ``first\_name'' and value ``last\_name'',
+and put 1951 and 2014 into the two additional variables. For instance,
+assuming you have defined ``first\_name'' and ``last\_name''.
+\begin{code}
+val bYear = 1951
+val dYear = 2014
+println(s"$first_name $last_name ($bYear - $dYear)")
+\end{code}
+
+\end{enumerate}
+\comment{
+\subsection{Sample Answer}
+\begin{code}
+scala>  val bYear = 1951
+bYear: Int = 1951
+
+scala>  val dYear = 2014
+dYear: Int = 2014
+
+scala> println(s"$first_name $last_name ($bYear - $dYear)")
+Robin Williams (1951 - 2014)
+\end{code}
+}
+
+\section{If-else}
+
+\begin{enumerate}
+\item Type the following code snippet in the Scala REPL and observe the output.
+\begin{code}
+val i = 1
+if (i / 2 >= 0.5) {
+  println(s" ${i} / 2 is greater than or equal to  0.5") } 
+else { 
+   println(s"${i} / 2 is less than 0.5") 
+}
+\end{code}
+\end{enumerate}
+
+
+\section{List and List operation}
+
+\begin{enumerate}
+\item Declare a list of integer {\tt l1} with integers 1, 2, 3 and 4.
+\item Declare a second list {\tt l2} whose elements are the odd values of {\tt
+    l1} incremented by 1.
+\item Find out the head and the tail of {\tt l2}.
+\item Reverse {\tt l2}.
+\item Concatenate {\tt l1} and {\tt l2}
+\item Compute the sum of {\tt l1}
+\end{enumerate}
+
+\comment{
+\subsection{Sample Answer}
+\begin{code}
+scala> val l1 = List(1,2,3,4)
+l1: List[Int] = List(1, 2, 3, 4)
+
+scala> val l2 = for { x <- l1; if x \% 2 == 1} yield (x + 1)// or
+l2: List[Int] = List(2, 4)
+
+scala> val l2a = l1.filter ( x => x \% 2 == 1 ).map( x => x + 1)
+l2a: List[Int] = List(2, 4)
+
+scala> l2.head
+res0: Int = 2
+
+scala> l2.tail
+res1: List[Int] = List(4)
+
+scala> l2.reverse
+res2: List[Int] = List(4, 2)
+
+scala> l1 ++ l2
+res3: List[Int] = List(1, 2, 3, 4, 2, 4)
+
+scala> l1.foldLeft(0)( (s,x) => s + x )
+res4: Int = 10
+\end{code}
+}
+
+\section{Object Oriented Programming}
+
+\begin{enumerate}
+\item In the terminal, change the working directory to {\tt
+    {}~/git/learning-scala/codes/oop}.
+\item Examine the code {\tt OOP.scala}, are you able to identify the
+  class constructors, member fields, member methods? Are you able to
+  identify the class inheritence? 
+\begin{code}
+class Person(n:String,i:String) {
+	private val name:String = n
+	private val id:String   = i
+	def getName():String = name
+	def getId():String = id
+}
+
+trait NightOwl {
+	def stayUpLate():Unit
+}
+
+class Student(n:String, i:String, g:Double) extends Person(n,i) with NightOwl {
+	private var gpa = g
+	def getGPA() = gpa
+	def setGPA(g:Double) =
+	{
+		gpa = g
+	}
+	override def stayUpLate():Unit =
+	{
+		println("woohoo")
+	}
+}
+
+class Staff(n:String, i:String, sal:Double) extends Person(n,i) {
+	private var salary = sal
+	def getSalary() = salary
+	def setSalary(sal:Double) =
+	{
+		salary = sal
+	}
+}
+\end{code}
+\item Load the class in the Scala REPL and test it out
+\begin{code}
+scala> :load OOP.scala
+Loading OOP.scala...
+defined class Person
+defined trait NightOwl
+defined class Student
+defined class Staff
+
+scala> val tom = new Student("Tom", "X1235", 4.0)
+tom: Student = Student@601c1dfc
+
+scala> val jerry = new Staff("Jerry", "T0001", 500000.0)
+jerry: Staff = Staff@650fbe32
+
+scala> tom.stayUpLate
+woohoo
+\end{code}
+\end{enumerate}
+
+\section{Functional Programming in Scala}
+\begin{enumerate}
+\item In the terminal, change the working directory to {\tt
+    {}~/git/learning-scala/codes/fp}.
+\item Examine the code {\tt Exp.scala}, are you able to identify the
+  sealed trait, the case class, and the pattern matching?
+\begin{code}
+sealed trait Exp
+case class Val(v:Int) extends Exp
+case class Plus(e1:Exp, e2:Exp) extends Exp
+
+def simp(e:Exp):Exp = e match
+{
+	case Val(v) => e
+	case Plus(Val(0), e2) => e2
+	case Plus(e1,e2) => Plus(simp(e1), simp(e2))
+}
+\end{code}
+
+\item Run it with Scala REPL
+\begin{code}
+$ scala
+scala> :load Exp.scala
+scala> val e = Plus(Val(0), Plus(Val(1), Val(2)))
+e: Plus = Plus(Val(0),Plus(Val(1),Val(2)))
+
+scala> simp(e)
+res0: Exp = Plus(Val(1),Val(2))
+\end{code}
+%$
+\item Note that $x - 0 = x$, $x * 1 = x$, $x / 1 = x$ for all $x$, can
+  we extend our {\tt Exp} data type and the simplification {\tt simp} to handle minus, multiplication, and division?
+\item Note that the simplification is not througout, e.g. 
+\begin{code}
+scala> val e2 = Plus(Val(0), Plus(Val(0),Val(2)))
+e2: Plus = Plus(Val(0),Plus(Val(0),Val(2)))
+
+scala> simp(e2)
+res1: Exp = Plus(Val(0),Val(2))
+\end{code}
+How can we fix it?
+\end{enumerate}
+
+\comment{
+\subsection{Sample Answer}
+
+\begin{code}
+sealed trait Exp
+case class Val(v:Int) extends Exp
+case class Plus(e1:Exp, e2:Exp) extends Exp
+case class Minus(e1:Exp, e2:Exp) extends Exp
+case class Mult(e1:Exp, e2:Exp) extends Exp
+case class Div(e1:Exp, e2:Exp) extends Exp
+
+def simp(e:Exp):Exp = e match
+{
+        case Val(v)            => e
+        case Plus(Val(0), e2)  => e2
+        case Plus(e1, Val(0))  => e1
+        case Plus(e1,e2)       => Plus(simp(e1), simp(e2))
+        case Minus(e1, Val(0)) => e1
+        case Minus(e1, e2)     => Minus(simp(e1), simp(e2))
+        case Mult(Val(1), e2)  => e2
+        case Mult(e1, Val(1))  => e1
+        case Mult(e1, e2)      => Mult(simp(e1), simp(e2))
+        case Div(e1, Val(1))   => e1
+        case Div(e1, e2)       => Div(simp(e1), simp(e2))
+}
+
+def simpFix(e:Exp):Exp =
+{
+        val e2 = simp(e)
+        if (e == e2)
+        {
+                e
+        }
+        else
+        {
+                simpFix(e2)
+        }
+}
+\end{code}
+}
+
+
+%\item Implement An Interpreter of Lambda Calculus 
+
+
+\end{document}
