@@ -14,9 +14,7 @@ def fv(t:Term):Set[String] = t match {
   case App(t1,t2) => fv(t1) ++ fv(t2)
 }
 
-
 val e1 = App(Var("x"), Lam("y",Var("y")))
-
 
 type Subst = (String, Term)
 
