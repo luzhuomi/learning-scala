@@ -1,0 +1,422 @@
+\documentclass[10pt]{article}
+
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{code}
+\usepackage{graphicx}
+
+\usepackage{listings}
+
+
+
+\usepackage[english]{babel}
+%\usepackage{blindtext}
+%\usepackage{fontspec}
+%\setmainfont{Arial}
+
+%\renewcommand{\familydefault}{\sfdefault}
+%\usepackage{blindtext}
+\pagenumbering{arabic}  % Arabic page numbers GM July 2000
+
+\usepackage{authoraftertitle}
+\usepackage{fancyhdr}
+% Clear the header and footer
+\fancyhead{}
+\fancyfoot{}
+%\lhead{\includegraphics[height=0.7cm]{../logo/nyp-logo-int.png} }
+\rhead{\scriptsize \MyTitle}
+%\lfoot{\scriptsize Specialist Diploma in Business \& Big Data Analytics\\ Copyright
+%  \copyright\ Nanyang Polytechnic. All Rights Reserved.}
+\rfoot{\thepage}
+\pagestyle{fancy}
+
+\include{macros-ms}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\textfraction}{0.02}
+\renewcommand{\floatpagefraction}{0.95}
+\newcommand{\diff}{-}
+
+
+\bibliographystyle{plain}
+
+%%\textwidth      150mm \textheight     210mm \oddsidemargin  -2mm \evensidemargin -2mm
+
+\renewcommand{\baselinestretch}{0.987}
+
+\setlength{\parskip}{0.0in}
+
+
+\newcommand{\Nturns}{\, \vdash_{\mbox{\scriptsize lnf}} \,}
+
+\newcommand{\tr}[1]{}
+%%\newcommand{\tr}[1]{#1}
+%%\newcommand{\nottr}[1]{#1}
+\newcommand{\nottr}[1]{}
+
+%\newcommand{\implies}{\supset}
+\newcommand{\clabel}[1]{\mbox{(#1)}}
+\newcommand{\rat}[1]{\rightarrowtail_{#1}}
+\newcommand{\arr}{\rightarrow}
+\newcommand{\arrow}{\rightarrow}
+\newcommand{\Arr}{\Rightarrow}
+\newcommand{\atsign}{@}
+\newcommand{\simparrow}[0]{\Longleftrightarrow}
+\newcommand{\proparrow}[0]{\Longrightarrow}
+\newcommand{\comment}[1]{}
+\newcommand{\ignore}[1]{}
+%\newcommand{\kl}[1]{{\bf KL:#1}} %%%{\marginpar{\sc kl}{\bf #1}}
+\newcommand{\kl}[1]{}
+\newcommand{\ms}[1]{{\bf MS:#1}}       %%{\marginpar{\sc ms}{\bf #1}}
+%%\newcommand{\jw}[1]{\marginpar{\sc jw}{\bf #1}}
+%% \newcommand{\answer}[1]{#1}
+
+\newcommand{\pjs}[1]{}
+%%\newcommand{\ms}[1]{}
+\newcommand{\jw}[1]{}
+%%\newcommand{\kl}[1]{}
+
+
+\newcommand{\pow}{\^{}}
+\newcommand{\venv}{\Delta}
+\newcommand{\mleq}{\mbox{\tt leq}}
+\newcommand{\mmleq}{\leq}
+\newcommand{\mas}{\mbox{\tt as}}
+\newcommand{\mfix}{\mu}
+
+\newcommand{\mysection}[1]{\vspace*{-2mm}\section{#1}\vspace*{-1mm}}
+\newcommand{\mysubsection}[1]{\vspace*{-1mm}\subsection{#1}\vspace*{-1mm}}
+
+\newcounter{cnt}
+\newtheorem{ex}{Example}
+%\newenvironment{example}{
+%        \begin{ex}\rm}%
+%    {\hfill$\Box$\end{ex}}
+
+\newenvironment{nexample}{
+        \begin{ex}\rm}%
+        {\end{ex}}
+
+%%\newtheorem{rem}{Remark}
+%%\renewenvironment{remark}{
+%%        \begin{rem}\rm}%
+%%    {\hfill$\Box$\end{rem}}
+
+%%\newenvironment{myexample}{
+%%        \begin{ex}\rm}%
+%%  {\hfill $\Diamond$\end{ex}}
+%\newenvironment{example}{
+%        \begin{example}\rm}%
+%    {\end{example}}
+
+\newenvironment{ttline}{\begin{trivlist}\item \tt}{\end{trivlist}}
+\newenvironment{ttprog}{\begin{trivlist}\small\item \tt
+        \begin{tabbing}}{\end{tabbing}\end{trivlist}}
+
+
+\newcommand{\figcode}[1]
+        {\begin{figure*}[t]#1
+        \end{figure*}}
+
+
+\title{%ITD353 Massively Parallel Computing for Big Data \\
+  Implementing Lambda Calculus in Scala }
+%\author{Kenny Zhuo Ming Lu\\
+%  \multicolumn{1}{p{.7\textwidth}}{\centering
+%  \emph{School of Information Technology \\ Nanyang Polytechnic \\
+%    180 Ang Mo Kio Avenue 8, Singapore 569830}}
+%}
+
+
+\begin{document}
+\maketitle \makeatactive
+\thispagestyle{fancy}
+
+\lstset{language=Python}
+
+%\begin{abstract}
+%\end{abstract}
+
+
+\section{Learning Outcomes} \label{sec:aims}
+\begin{itemize}
+ \item Understand and apply algebraic data type
+ \item Understand and apply State Monad
+\end{itemize}
+
+
+\section{Implementating Lambda Caculus}
+\begin{enumerate}
+\item Recall that Lambda Calculus syntax is defined as the following EBNF
+
+\bda{rccl}
+ \tlabel{Lambda Terms} & t & ::= & x \mid \lambda x.t \mid t~t
+\eda
+
+\item Check out the source code. Download and open {\tt LambdaCaculus.scala}, we will see 
+\begin{code}
+import scala.collection.Set
+
+object LambdaCalculus {
+
+  sealed trait Term
+  case class App(t1:Term, t2:Term) extends Term
+  case class Lam(x:String, t:Term) extends Term
+  case class Var(x:String) extends Term
+
+  val e0 = App(Var("x"), Lam("y",Var("y")))
+
+...
+\end{code} 
+%$ 
+Note that it is clear that the Scala algebraic data type above has the exact mapping to our EBNF definition. {\tt e0} defines a lambda term $(x~(\lambda y.y))$.
+Your first task is to define the following
+  \begin{itemize}
+  \item $(\lambda x.x)~(\lambda y.y)~(\lambda z.z)$
+  \item $\lambda x.(\lambda x.x~x~y)~(\lambda z.z~x)$
+  \item $(\lambda x.x~x)~(\lambda x.x~x)$
+  \item $(\lambda y.\lambda x.y) ~(\lambda z.z)~ ((\lambda x.x~x)~(\lambda x.x~x))$    
+  \end{itemize}
+%
+Let's call them {\tt e1}, {\tt e2}, {\tt e3} and {\tt e4}
+  \item In {\tt LambdaCaculus.scala}, we also found the following definition of {\tt pretty} which pretty-prints the given lambda term. 
+\begin{code}
+  def pretty(t:Term):String = t match {
+    case Var(x)     => x
+    case Lam(v,t)   => s"(\\${v}->" ++ pretty(t) ++")"
+    case App(t1,t2) => pretty(t1) ++ " " ++ pretty(t2)
+  }
+\end{code}
+%$
+where {\tt s"..."} denote a Scala string interpolation, in which {\tt \${v}} refers to the value of variable {\tt v}.
+For instance, 
+{\tt pretty(e0)} yields 
+\begin{code}
+x \y->y
+\end{code}
+Recall the definition of $fv$, 
+\bda{rcl}
+fv(x) & = & \{x\}\\
+fv(\lambda x.t) & = & fv(t) \diff \{x\} \\ 
+fv(t_1~t_2) & = & fv(t_1) \cup fv(t_2) 
+\eda
+%
+your next task is to define the {\tt fv} function in Scala which should have the function signature of 
+\begin{code}
+   def fv(t:Term):Set[String] = Set() // TODO:CHANGE ME
+\end{code}
+%\item Implement An Interpreter of Lambda Calculus 
+\item Thirdly, we consider the implementation of the substitution $\lbrack t/x \rbrack$, which is as follows
+\begin{code}
+  type Subst = (String, Term)
+\end{code}
+% 
+Recall the application of a substitution to a lambda term is defined as following equalities.
+\bda{rcll}
+ \lbrack t_1 / x \rbrack x & = & t_1 \\
+ \lbrack t_1 / x \rbrack y & = & y & \mbox{if}~ x \neq y \\
+ \lbrack t_1 / x \rbrack (t_2~t_3) & = & \lbrack t_1 / x \rbrack t_2~
+ \lbrack t_1 / x \rbrack t_3 & \\
+ \lbrack t_1 / x \rbrack \lambda y.t_2 & = & \lambda y. \lbrack t_1 / x
+ \rbrack t_2 & \mbox{if}~ y\neq x~ \mbox{and}~ y \not \in fv(t_1)
+\eda
+%
+Which can be implemented as follows with minor tweaks,
+\begin{code}
+def subst(s:Subst, t:Term, max:Int) : (Term,Int) = s match {
+    case (x,t1) => t match {
+      case Var(y) if x == y => (t1,max)
+      case Var(y)           => (Var(y),max)
+      case App(t2,t3)       => {
+        val (u2,max2) = subst(s,t2,max)
+        val (u3,max3) = subst(s,t3,max2)
+        (App(u2, u3),max3)
+      }
+      case Lam(y,t) if x == y => { // (1) 
+        (Lam(y,t),max)
+      }
+      case Lam(y,t) if fv(t1).contains(y) => { // (2)
+        val w = "x"+max
+        val max1 = max + 1
+        rename(w,y, t,max1) match {
+          case (t2,max2) => subst(s,Lam(w,t2),max2)
+        }
+      }
+      case Lam(y,t) => {
+        subst(s,t,max) match {
+          case (t1,max1) => (Lam(y,t1),max1)
+        }
+      }
+    }
+  }
+\end{code}
+%
+The above implementation defers from the defintion at {\tt (1)} and {\tt (2)}. At {\tt (1)}, we consider the case where substitution variable {\tt x} is identical to
+the lambda bound variable {\tt y}. Based our defintion, we should stop and signal an error. In the actual implementation, we just return the original lambda abstraction without substitution.
+This is fine, because if we were to rename {\tt y} in the lambda abstraction, we get back the same term (under $\alpha$ renaming), since {\tt y} is identical {\tt x}, there is no other
+possible free variable in {\tt t} that could be equal to {\tt x}. 
+At {\tt (2)}, we found the lambda variable {\tt y} is in the set of free variables in {\tt t}, the payload of the substitution. We have to rename {\tt y} by a fresh variable {\tt w}. {\tt w} is fresh because it is
+variable suffixed by a running number {\tt max}. Note that because of this requirement we have to thread {\tt max} through the {\tt subst} function, that is, 
+expecting {\tt max} as its input and returning the updated {\tt max} as output.  The alpha renaming is implemented in {\tt rename}.
+\begin{code}
+  def rename(w:String, v:String, t:Term, max:Int):(Term,Int) = 
+    subst((v,Var(w)),t,max)
+\end{code}
+%
+{\tt w} is the fresh variable, {\tt v} is the lambda bound variable to be replaced, {\tt t} is the body. The task is to replace all free occurrances of {\tt v} in {\tt t} by {\tt w}.
+We can achieve that by calling {\tt subst((v,Var(w)),t,max)}, because {\tt w} must be fresh and it must not have been used by any lambda abstraction in {\tt t}.
+\item With {\tt subst} nailed, we can move on with the implementation of the reduction strategy, specifically, we conslider NOR which is easier to be implemented in Scala.
+NOR favors to apply $\beta$-reduction to the outer-most left-most redex in the given lambda term. In Scala, we can use pattern matching to ``scan'' through the structure of the input lambda
+term from outer-most to inner-most.
+\begin{code}
+  def nor(t:Term, max:Int):(Term,Int) = t match { // we apply
+    case Var(x)   => (Var(x),max)
+    case App(Lam(v,t1),t2) => {
+      val s = (v,t2)
+      subst(s,t1,max)
+    }
+    case App(t1,t2) => nor(t1,max) match {
+      case (t3,max3) if equiv(t1,t3,max3) => nor(t2,max3) match {
+        case (t4,max4) => (App(t3,t4),max4)
+      }
+      case (t3,max3) => (App(t3,t2),max3)
+    }
+    // exercise: implement the missing case for Lam(v,t1) TODO: CHANGE ME
+  }
+
+def equiv(t1:Term, t2:Term, max:Int):Boolean = true // TODO: CHANGE ME
+\end{code}
+%
+The {\tt nor} function is defined inductively over the structore of the input lambda term {\tt t}. In case of a variable, we return the variable.
+In case of an application of a redex, we apply $\beta$ reduction. In case of an application of non-redex, we reduce the left sub-term if it is reducible,
+otherwise, we reduce the right sub-term.
+
+Note that there are two missing parts in the above implementation. 
+
+First of all the case of lambda abstraction is missing. In case of a lambda abstraction, 
+we should ``look'' inside the body of the function and search for redex to reduce. Your task is to implement the missing case.
+
+Secondly, the equivalence test {\tt equiv} among two lambda terms is missing.
+We can't use {\tt ==} nor {\tt eq} direclty from Scala, because they compare the referenced memory addresses among objects. 
+We need something test for structural equivalence and ignore the 
+variable names, which is defined as the $t_1 \equiv t_2$ relation follows,
+\bda{ccl}
+x \equiv y  & \iff & x = y \\
+\lambda x.t_1  \equiv  \lambda y.t_2 & \iff & \lbrack w/x \rbrack t_1 \equiv \lbrack w/y \rbrack t_2 ~ \mbox{where}~ w~ \mbox {is a fresh variable}. \\ 
+(t_1~t_2) \equiv (t_3~t_4) & \iff & t_1 \equiv t_3~\wedge~t_2\equiv t_4
+\eda
+%
+Your task is to fix the {\tt equiv} function. The hint is that you need the {\tt max} in order to generate fresh variable $w$.
+
+\item With the above implemented, we can make a step forward to implement a ``big-step'' reduction which recursively applies {\tt nor} until the lambda term remains unchanges.
+\begin{code}
+  def norS(t:Term):Term = {
+    def reduce(t:Term,max:Int):(Term,Int) = nor(t,max) match {
+      case (t1,max1) => {
+        if (equiv(t,t1)) {
+          (t1,max1)
+        } else {
+          reduce(t1,max1)
+        }
+      }
+    }
+    reduce(t,0)._1
+  }
+\end{code}
+Your task to test {\tt norS} against {\tt e0}, {\tt e1}, {\tt e2}, {\tt e3} and {\tt e4}.
+
+\end{enumerate}
+
+\section{Simplify variable threading using State Monad}
+
+Note that in the above implementation, in order to generate the fresh variable, we've been threading the {\tt max} variable around. This works but badly affects
+the readbility and the maintainability of the code. 
+
+A state monad is a monad which provides the abstraction of all transition computations that read a state as inputs and returns the modified state as part of the output. For instance {\tt max} in our case.
+Concretely, 
+\begin{code}
+trait Monad[F[_]] {
+  def point[A](a: => A): F[A] 
+  def bind[A, B](fa: F[A])(f: A => F[B]): F[B]
+} 
+
+case class State[S,A]( run : S => (S,A) ) 
+
+implicit def stateMonad[S] = new Monad[({type L[B] = State[S,B]})#L] { // (1)
+  override def point[A](a: => A): State[S, A] =  (st => (a, st))             
+  override def bind[A, B](p: State[S, A])(f: A => State[S, B]): State[S, B] =
+    s1 => { p.run(s1) match {
+         case (s2,a) => f(a).run(s2) 
+      }
+   }
+}
+\end{code}
+%
+At {\tt (1)} we define a type class instance of state monad. To allow higher order type, we use 
+{\tt ({type L[B] = State[S,B]})\#L} to denotes that {\tt L} is partially applied type constructor 
+in which {\tt State} applied partially applied to {\tt S}, for all possible type paremeter {\tt B}.
+
+
+The above is a simplified definition of state monad which shipped with scalaz. With scalaz, we can simplify 
+our lambda calculus implentation with the following combinator, 
+\begin{code}
+  case class Ctxt(maxid:Int)
+
+  def freshVar:State[Ctxt,String] = for {
+    ctxt <- get[Ctxt] // local type inference is too weak
+    val maxid = ctxt match { case Ctxt(maxid) => maxid }
+    _ <- put(Ctxt(maxid+1))
+  } yield ("x" +maxid)
+\end{code}
+%
+{\tt freshVar} get the current {\tt maxid} from the state {\tt Ctxt}, increments it and returns a fresh variable. Now the implementation of {\tt subst}
+is much simpler
+\begin{code}
+  def subst(s:Subst, t:Term): State[Ctxt,Term] = s match {
+    case (x,t1) => t match {
+      case Var(y) if x == y => point(t1)
+      case Var(y)           => point(Var(y))
+      case App(t2,t3)       => for {
+        u2 <- subst(s,t2)
+        u3 <- subst(s,t3)
+      } yield App(u2, u3)
+      case Lam(y,t) if x == y => {
+        point(Lam(y,t))
+      }
+      case Lam(y,t) if fv(t1).contains(y) => for {
+        w  <- freshVar
+        t2 <- rename(w, y, t)
+        r  <- subst(s,Lam(w,t2))
+      } yield r
+      case Lam(y,t) => for {
+        t1 <- subst(s,t)
+      } yield Lam(y,t1)
+    }
+  }
+
+  def rename(w:String, v:String, t:Term):State[Ctxt,Term] =
+    subst((v,Var(w)),t)
+\end{code}
+
+To check out the code template, unzip {\tt lambdacalculus\_monad.zip}, and open {\tt src/main/scala/examples/LambdaCalculusState.scala}.
+Make the changes like what you did in the previous section (modula the part of updating the {\tt max} variable and the monad for comprehension).
+
+To run it, you need to use go to the extracted folder, type {\tt sbt console}. 
+Note that in case you are behind firewall, you need to modify {\tt sbtconfig.txt} (In Windows, {\tt C:/Program Files/sbt/config/sbtconfig.txt} with the following
+\begin{code}
+-Dhttp.proxyHost=proxy.hs-karlsruhe.de
+-Dhttp.proxyPort=8888
+-Dhttp.proxyUser=username
+-Dhttp.proxyPassword=password
+-Dhttps.proxyHost=proxy.hs-karlsruhe.de
+-Dhttps.proxyPort=8888
+-Dhttps.proxyUser=username
+-Dhttps.proxyPassword=password
+\end{code}
+But remember to remove it before you logout.
+
+\section{Implementing AOR}
+Can you implement AOR? \\ 
+ Hint, we still traverse the lambda term structurally from outer to inner, excep that  when we see a redex of shape {\tt App(Lam(v,t1),t2)} we need to check whether 
+there exists inner redex in {\tt t1} or {\tt t2}.
+
+\end{document}
