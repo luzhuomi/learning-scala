@@ -466,6 +466,8 @@ def simpFix(e:Exp):Exp =
 
 \section{Data Processing}
 
+\subsection{CSV}
+
 Given a CSV file as follows,
 \begin{code}
 user1,account1,230
@@ -481,7 +483,7 @@ user10,account10,123
 \end{code}
 
 The following Scala code loads the CSV file from the file system and
-replaces the commas by ``|'' , prints out the lines on the standard
+replaces the commas by ``$|$'' , prints out the lines on the standard
 output and writes the lines into an output file
 
 \begin{code}
@@ -538,5 +540,163 @@ res0: Int = 1
    max, mean and median requires the use of for-loop, can you rewrite
    it using {\tt map}, {\tt sortWith} and {\tt foldLeft}?
 \end{enumerate}
+
+
+\subsection{JSON}
+
+JSON is another popular data type format. Many libraries allow us to map a relation between a
+Scala data structure and a JSON object. One of them is {\tt gson}.
+
+The following example code demonstrates how a Scala case class {\tt
+  Contact} (A phone contact) be converted to and from JSON objects.
+
+\begin{code}
+import com.google.gson.Gson
+
+object JSONExample extends App {
+    case class Contact(firstName: String, lastName: String, phone: Int)
+    val ironman = new Contact("Tony", "Stark", 12345678)
+    val gson = new Gson
+    println(gson.toJson(ironman))
+    val cap = gson.fromJson("""
+        {"firstName":"Steve","lastName":"Roger","phone":0}
+    """, classOf[Contact]
+    )
+    println(gson.toJson(cap))
+}
+\end{code}
+
+Using {\tt scala} directly to interpret the {\tt
+  JSONExample.scala} file won't work, because gson demands the existence of the
+class for conversion, (in this case, the class {\tt Contact} needs to
+be compiled first before the conversion taking place. We first compile
+then run
+\begin{code}
+  $ scalac JSONExample.scala  -cp gson-2.3.1.jar
+  $ scala -cp ./gson-2.3.1.jar:. JSONExample
+\end{code}
+We see the following output
+\begin{code}
+{"firstName":"Tony","lastName":"Stark","phone":12345678}
+{"firstName":"Steve","lastName":"Roger","phone":0}
+\end{code}
+
+Based on the example above, write a Scala program to turn the
+  following JSON file
+  \begin{code}
+{
+   "library": [	
+      {
+         "id":"01",
+         "language": "Java",
+         "edition": "third",
+         "author": "Herbert Schildt"
+      },	
+      {
+         "id":"07",
+         "language": "C++",
+         "edition": "second",
+         "author": "E.Balagurusamy"
+      }
+   ]
+}
+  \end{code}
+  Into a CSV file
+  \begin{code}
+    01,Java,third,Herbert Schildt
+    07,C++,second,E.Balagurursamy
+  \end{code}  
+
+%
+Hint, you may considering using the following data type to transform
+the JSON object into CSV format
+\begin{code}
+    case class Book(id:String, language:String, edition:String, author:String)
+    case class Library(books:Array[Book])
+  \end{code}
+
+
+Other implementations of JSON conversion in Scala can be found in the
+following 
+\begin{enumerate}
+\item
+\begin{verbatim}
+https://app.assembla.com/spaces/liftweb/wiki/JSON_Support
+\end{verbatim}
+\item
+\begin{verbatim}
+https://www.playframework.com/documentation/2.6.x/ScalaJson
+\end{verbatim}
+\end{enumerate}
+
+
+\subsection{Regex}
+
+Regular expression is a powerful embeded language to match extract
+sequence of items, for instance strings. For instance the following
+regex extract all anchored link from a HTML page.
+\begin{code}
+<a href=\"([^.]*)\"[^>]*>
+\end{code}
+Note that the sub pattern
+\begin{code}
+  href=\"([^\"]*)\"
+\end{code}
+performs most of the extraction. The parantheses define a capturing group which captures and stores the
+link for output usage. The sub pattern
+\begin{code}
+ [\^"]*
+\end{code}
+matches string of any length as
+long as it does not contain the double quote.
+
+By embedding the above regex in our Scala code as follows, we are able
+to extract all links in a HTML page.
+\begin{code}
+import java.io._
+object LinkExtractor extends App {
+
+    val inFile = io.Source.fromFile("./page.html")
+    val outFile = new PrintWriter(new File("./output.txt" ))
+    val anchor = """.*<a href=\"([^"]*)\"[^>]*>.*""".r
+    val links = for (line <- inFile.getLines)  {
+        line match {
+            case anchor(link) => 
+                outFile.write(s"${link}\n")
+            case _ => () 
+        }
+    }
+    inFile.close
+    outFile.close
+}
+\end{code}
+%$
+
+Note that there is a problem with the above implementation, it only
+extracts the first match in every line if there exists a match. To
+explore all sub matches in a line, we need to use the {\tt findAllIn}
+method.
+\begin{code}
+
+import java.io._
+object LinkExtractor2 extends App {
+    val inFile = io.Source.fromFile("./page.html")
+    val outFile = new PrintWriter(new File("./output.txt" ))
+    val anchor = """<a href=\"([^"]*)\"[^>]*>""".r
+    val links = for (line <- inFile.getLines) {
+        for (link <- anchor.findAllIn(line)) {
+            outFile.write(s"${link}\n")
+        }
+    }
+    inFile.close
+    outFile.close
+}
+\end{code}
+%$
+
+For all the valid syntax of regex and testing of regex, please refer to
+\begin{verbatim}
+https://regex101.com/
+\end{verbatim}
 
 \end{document}
