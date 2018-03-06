@@ -699,4 +699,190 @@ For all the valid syntax of regex and testing of regex, please refer to
 https://regex101.com/
 \end{verbatim}
 
+\subsection{Stop words removal}
+Stop words such as ``the'', ``a'', ``is'' are too common to make a
+different in text analytics model. It is a common practice to remove
+them from the corpuses before processing. The following Scala script
+does the remove by refering to a predefine set of stop words.
+\begin{code}
+import java.io._
+
+object StopWords extends App {
+  val inFile = io.Source.fromFile("./input.txt")
+  val outFile = new PrintWriter(new File("./output.txt" ))
+  // TODO: read the stop words from a file.
+  val stop_words = List("and", "is", "it", "are", "in", "rt", "what", "from",
+                "her", "to", "their", "you", "me", "his", "http", "that", "they", "by",
+                "he", "a", "on", "for", "i", "of", "this", "she", "the", "my", "at").toSet
+  for (line <- inFile.getLines) {
+    val words = line.toLowerCase.split(" ").map(_.trim)
+    val no_stopwords = words.filter( w => !stop_words.contains(w))
+    outFile.write(no_stopwords.mkString(" ") + "\n")
+  }
+  inFile.close
+  outFile.close
+}
+\end{code} 
+%
+Given the {\tt input.txt} file contains the following 
+\begin{code}
+The quick brown fox jumps over the lazy dog
+\end{code}
+the {\tt output.txt} file will be generated with the following content
+\begin{code}
+quick brown fox jumps over lazy dog
+\end{code}
+
+Your task is to modify the above script so that the stop words are
+read from a file {\tt stopwords.txt} instead of being hard-coded in
+the script. 
+
+\subsection{Word count}
+To generate infographic with word cloud, we have to count the number
+of occurrences of all the words appearing in the corpuses.  For
+instance, the word count of the following file
+\begin{code}
+hey diddle diddle
+the cat and the fiddle
+the cow jumped over the
+ moon
+the little dog laughed
+to see such sport
+and the dish ran away
+ with the spoon
+\end{code}
+
+Will be 
+\begin{code}
+,2
+moon,1
+jumped,1
+cow,1
+ran,1
+dog,1
+such,1
+dish,1
+to,1
+spoon,1
+sport,1
+over,1
+diddle,2
+little,1
+with,1
+cat,1
+see,1
+hey,1
+away,1
+and,2
+laughed,1
+the,7
+fiddle,1
+\end{code}
+
+There are two possible implementation of the word count. The first
+implementation uses imperative style (similar to Java) 
+\begin{code}
+import java.io._
+import scala.collection._
+object WordCount extends App {
+  val inFile = io.Source.fromFile("./input.txt")
+  val outFile = new PrintWriter(new File("./output.txt" ))
+  var dict = Map[String,Int]()
+  for (line <- inFile.getLines) {
+    val words = line.split(" ")
+    for (w <- words) {
+      dict.get(w) match {
+        case None => dict = dict + ((w,1))
+        case Some(counts) => dict = dict + ((w,counts + 1))
+      }
+    }
+  }
+  val wordCount = dict.toList
+  for ( wc <- wordCount ) {
+    outFile.write(s"${wc._1},${wc._2}\n")
+  }
+  inFile.close
+  outFile.close
+}
+\end{code}
+The second implementation uses functional programming (map and fold) 
+\begin{code}
+import java.io._
+import scala.collection._
+object WordCountFun extends App {
+  val inFile = io.Source.fromFile("./input.txt")
+  val outFile = new PrintWriter(new File("./output.txt" ))
+  val words = inFile.getLines.toList.flatMap( line => line.split(" ") )
+  val empty_dict = Map[String,List[Int]]()
+  val wordCount = words.map(w => (w,1))
+          .foldLeft(empty_dict)( (dict,t) => t match {
+            case (w,one) => dict.get(w) match {
+              case None => dict + ((w,List(one)))
+              case Some(ones) => dict + ((w,ones ++ List(one)))
+            }
+          })
+          .toList
+          .map( wl => wl match {
+            case (w,l) => (w,l.sum)
+          })
+  for ( wc <- wordCount ) {
+    outFile.write(s"${wc._1},${wc._2}\n")
+  }
+  inFile.close
+  outFile.close
+}
+\end{code}
+
+
+\subsection{TF-IDF}
+
+\begin{itemize}
+ \item TF-IDF stands for Term frequency - Inverse document
+   frequency. It is a classic and powerful technique to search for
+   interesting terms from a set of documents.
+ \item TF is actually the word count. For instance, consider the
+   following two values of the {\tt content} column in the {\tt
+     html\_crawl} table.
+   \begin{code}
+      apple smart phone
+      android smart phone
+   \end{code}
+   The term frequency is 
+   \begin{code}
+     apple, 1
+     android, 1
+     phone, 2
+     smart, 2
+   \end{code}
+ \item IDF is is the total number of documents/records divided by the
+   total number of the documents/records containing the words. We
+   apply logarithmic to the quotient.
+  The IDF for the above example is 
+ \begin{code}
+    apple, log(2/1) 
+    android, log(2/1)
+    phone, log(2/2)
+    smart, log(2/2) 
+  \end{code}
+   that is 
+ \begin{code}
+    apple, 0.693
+    android, 0.693
+    phone, 0
+    smart, 0
+  \end{code}
+  \item TF-IDF is obtained by multiplying the TF with the IDF.
+ \begin{code}
+    apple, 0.693
+    android, 0.693
+    phone, 0
+    smart, 0
+  \end{code}
+  This shows that apple and android are the interesting terms coming
+  from the records.
+ \item Please use Scala to develop a script to compute the
+   TF-IDF of a given file containing text.
+\end{itemize}
+
+
 \end{document}
